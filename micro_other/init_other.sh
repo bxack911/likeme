@@ -1,0 +1,1 @@
+kubectl apply -f other-deployment.yaml,other-service.yaml

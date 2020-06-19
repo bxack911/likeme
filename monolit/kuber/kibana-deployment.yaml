@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monolit-kibana-deployment
+  labels:
+    app: monolit-kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: monolit-kibana
+  template:
+    metadata:
+      labels:
+        app: monolit-kibana
+    spec:
+      containers:
+        - name: monolit
+          image: kibana:7.7.0
+          env:
+            - name: ELASTICSEARCH_HOSTS
+              value: http://172.17.0.3:30003
+            - name: xpack.monitoring.collection.enabled
+              value: "false"
+          ports:
+            - containerPort: 5601

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monolit-webserver
+  labels:
+    app: monolit-apache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: monolit-apache
+  template:
+    metadata:
+      labels:
+        app: monolit-apache
+    spec:
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+      - name: php-apache
+        image: bxack911/apache-php-7.4
+        imagePullPolicy: Always
+        env:
+        - name: DOCKER_HOST
+          value: unix:///var/run/docker.sock
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: hostvol
+          mountPath: /var/www/html/
+        - name: portsvol
+          mountPath: /etc/apache2/ports.conf
+      volumes:
+        - name: hostvol
+          hostPath:
+            path: /data/monolit/html
+        - name: portsvol
+          hostPath:
+            path: /data/monolit/apache/ports.conf

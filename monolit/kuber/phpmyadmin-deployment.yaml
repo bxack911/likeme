@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monolit-phpmyadmin-deployment
+  labels:
+    app: monolit-phpmyadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: monolit-phpmyadmin
+  template:
+    metadata:
+      labels:
+        app: monolit-phpmyadmin
+    spec:
+      containers:
+        - name: monolit-phpmyadmin
+          image: phpmyadmin/phpmyadmin
+          ports:
+            - containerPort: 80
+          env:
+            - name: PMA_HOST
+              value: monolit-mysql8-service
+            - name: PMA_PORT
+              value: "3306" 
+            - name: PMA_USER
+              value: root
+            - name: PMA_PASSWORD
+              value: .sweetpwd.

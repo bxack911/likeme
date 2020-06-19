@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: products-mysql8-service
+  labels:
+    app: products-mysql8
+spec:
+  type: NodePort
+  ports:
+  - port: 3306
+    protocol: TCP
+  selector:
+    app: products-mysql8

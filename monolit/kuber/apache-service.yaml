@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: monolit-web-service
+  labels:
+    run: monolit-web-service
+spec:
+  externalTrafficPolicy: "Local"
+  type: LoadBalancer
+  ports:
+  - port: 8080
+    protocol: TCP
+  selector:
+    app: monolit-apache

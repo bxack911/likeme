@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: products-phpmyadmin-deployment
+  labels:
+    app: products-phpmyadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: products-phpmyadmin
+  template:
+    metadata:
+      labels:
+        app: products-phpmyadmin
+    spec:
+      containers:
+        - name: products-phpmyadmin
+          image: phpmyadmin/phpmyadmin
+          ports:
+            - containerPort: 80
+          env:
+            - name: PMA_HOST
+              value: products-mysql8-service
+            - name: PMA_PORT
+              value: "3306" 
+            - name: PMA_USER
+              value: root
+            - name: PMA_PASSWORD
+              value: .products.

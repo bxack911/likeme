@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monolit-mysql
+spec:
+  selector:
+    matchLabels:
+      app: monolit-mysql8
+  template:
+    metadata:
+      labels:
+        app: monolit-mysql8
+    spec:
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - image: mysql:8.0
+          imagePullPolicy: Always
+          name: monolit-mysql
+          env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: .sweetpwd.
+          - name: MYSQL_DATABASE
+            value: my_db
+          - name: MYSQL_USER
+            value: db_user
+          - name: MYSQL_PASSWORD
+            value: .mypwd
+          args: ["--default-authentication-plugin=mysql_native_password"]
+          ports:
+          - containerPort: 3306
+          name: monolit-mysql8
+          volumeMounts:
+          - name: dbvol
+            mountPath: /var/lib/mysql
+      volumes:
+        - name: dbvol
+          hostPath:
+            path: /data/monolit/db/

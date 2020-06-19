@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: other-web-app
+  labels:
+    app: other-web-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: other-web-app
+  template:
+    metadata:
+      labels:
+        name: other-web-app
+    spec:
+      containers:
+      - name: other-application
+        image: golang:1.14.3-alpine3.11
+        imagePullPolicy: Always
+        command: ["/bin/sh","-c","cd /app && go build -o main . && /app/main"]
+        ports:
+        - containerPort: 8081
+        volumeMounts:
+        - name: othervol
+          mountPath: /app
+      volumes:
+        - name: othervol
+          hostPath:
+            path: /data/micro_other/app/

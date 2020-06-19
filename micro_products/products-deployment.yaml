@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: products-web-app
+  labels:
+    app: products-web-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: products-web-app
+  template:
+    metadata:
+      labels:
+        name: products-web-app
+    spec:
+      containers:
+      - name: products-application
+        image: golang:1.14.3-alpine3.11
+        imagePullPolicy: Always
+        command: ["/bin/sh","-c","cd /app && go build -o main . && /app/main"]
+        ports:
+        - containerPort: 8081
+        volumeMounts:
+        - name: productsvol
+          mountPath: /app
+      volumes:
+        - name: productsvol
+          hostPath:
+            path: /data/micro_products/app/

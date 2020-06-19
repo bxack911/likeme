@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monolit-elasticsearch
+  labels:
+    app: monolit-elasticsearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: monolit-elasticsearch
+  template:
+    metadata:
+      labels:
+        app: monolit-elasticsearch
+    spec:
+      containers:
+      - name: monolit-elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+        env:
+        - name: node.name
+          value: elastic
+        - name: cluster.name
+          value: elastic
+        - name: discovery.seed_hosts
+          value: monolit-elasticsearch-service
+        - name: cluster.initial_master_nodes
+          value: elastic
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9200
+        volumeMounts:
+        - name: elasticvol
+          mountPath: /usr/share/elasticsearch/data/
+      volumes:
+        - name: elasticvol
+          hostPath:
+            path: /data/monolit/elk/elastic
