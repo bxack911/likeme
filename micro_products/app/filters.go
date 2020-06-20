@@ -72,6 +72,8 @@ func GetFilters(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
             var tag PropertiesTable
 
+            childs_filters := make(map[int]map[string]string)
+
 
             properties_err := results_properties.Scan(&tag.ID,&tag.ProductId,&tag.Status,&tag.Parent,&tag.Name,&tag.Value)
             if properties_err != nil {
@@ -90,35 +92,48 @@ func GetFilters(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
                 panic(childs_props_err.Error())
             }
 
+            counter_filter := 0
             for child_properties.Next() {
 
                 var childs ChildProperties
 
-                child_props_err := results_properties.Scan(&childs.ID,&childs.ProductId,&childs.Status,&childs.Parent,&childs.Name,&childs.Value)
+                child_props_err := child_properties.Scan(&childs.ID,&childs.ProductId,&childs.Status,&childs.Parent,&childs.Name,&childs.Value)
                 if child_props_err != nil {
                     panic(child_props_err.Error())
                 }
 
-                filters["props"] = map[int]map[string]map[string]string{
-                    tag.ID:map[string]map[string]string{
-                        "prop":map[string]string{
-                            "id":strconv.Itoa(tag.ID),
-                            "product_id":strconv.Itoa(tag.ProductId),
-                            "status":strconv.Itoa(tag.Status),
-                            "parent":strconv.Itoa(tag.Parent),
-                            "name":tag.Name,
-                            "value":tag.Value,
-                        },
-                        "childs":map[string]string{
-                            "id":strconv.Itoa(childs.ID),
-                            "product_id":strconv.Itoa(childs.ProductId),
-                            "status":strconv.Itoa(childs.Status),
-                            "parent":strconv.Itoa(childs.Parent),
-                            "name":childs.Name,
-                            "value":childs.Value,
-                        },
-                    },
+                childs_filters[counter_filter] = map[string]string{
+                    "id":strconv.Itoa(childs.ID),
+                    "product_id":strconv.Itoa(childs.ProductId),
+                    "status":strconv.Itoa(childs.Status),
+                    "parent":strconv.Itoa(childs.Parent),
+                    "name":childs.Name,
+                    "value":childs.Value,
                 }
+
+                counter_filter++
+            }
+
+            childs_propsJson, childs_props_err := json.Marshal(childs_filters)
+            if childs_props_err != nil {
+                log.Fatal("Cannot encode to JSON ", childs_props_err)
+            }
+
+
+            filters["props"] = map[int]map[string]map[string]string{
+                tag.ID:map[string]map[string]string{
+                    "prop":map[string]string{
+                        "id":strconv.Itoa(tag.ID),
+                        "product_id":strconv.Itoa(tag.ProductId),
+                        "status":strconv.Itoa(tag.Status),
+                        "parent":strconv.Itoa(tag.Parent),
+                        "name":tag.Name,
+                        "value":tag.Value,
+                    },
+                    "childs":map[string]string{
+                        "array":string(childs_propsJson),
+                    },
+                },
             }
         }
     }

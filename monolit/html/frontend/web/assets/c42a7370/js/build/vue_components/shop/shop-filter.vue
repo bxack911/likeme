@@ -26,7 +26,7 @@
                 <div class="filter-section js-filter_section-wrapper" v-for="filter in filters.props">
                   <label class="filter_section-title js-filter_section-toggler"><span>{{ filter['prop'].name }}</span><i class="fa fa-angle-down"></i></label>
                   <ul class="filter_section-values filter_section-values--collapse js-filter_section-values padded">
-                    <li class="filter_section-value" v-for="prop in filter['childs']">
+                    <li class="filter_section-value" v-for="prop in JSON.parse(filter['childs']['array'])">
                       <input v-model="properties['properties']['props']" type="checkbox" :value="prop.id" class="filter_section-value_input js-filter_section-value_input"/>
                       <a class="filter_section-value_link js-filter_section-value_link">{{ prop.name }}</a>
                     </li>
@@ -65,7 +65,6 @@
         axios.get('http://172.17.0.3:30101/get-filters/ru/' + this.category).then((response) => {
           this.filters = new Array(response.data.length);
           this.filters = response.data;
-          console.log(this.filters);
           this.prices = [
             this.filters.prices[0]["price"]["min"],
             this.filters.prices[0]["price"]["max"]
