@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-phpmyadmin-deployment
+  labels:
+    app: orders-phpmyadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orders-phpmyadmin
+  template:
+    metadata:
+      labels:
+        app: orders-phpmyadmin
+    spec:
+      containers:
+        - name: orders-phpmyadmin
+          image: phpmyadmin/phpmyadmin
+          ports:
+            - containerPort: 80
+          env:
+            - name: PMA_HOST
+              value: orders-mysql8-service
+            - name: PMA_PORT
+              value: "3306" 
+            - name: PMA_USER
+              value: root
+            - name: PMA_PASSWORD
+              value: .orders.

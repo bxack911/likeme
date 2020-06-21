@@ -25,6 +25,9 @@ use common\models\Mediafiles;
  */
 class Units extends \yii\db\ActiveRecord
 {
+    public static function getDb() {
+        return Yii::$app->db_other;
+    }
     /**
      * {@inheritdoc}
      */

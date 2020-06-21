@@ -12,7 +12,7 @@ use common\behaviors\RoutableBehavior;
 use common\behaviors\TransliterBehavior;
 use creocoder\translateable\TranslateableBehavior;
 use zxbodya\yii2\galleryManager\GalleryBehavior;
-use pendalf89\filemanager\behaviors\MediafileBehavior;
+use common\modules\filemanager\behaviors\MediafileBehavior;
 
 /**
  * This is the model class for table "{{%products}}".
@@ -30,6 +30,10 @@ use pendalf89\filemanager\behaviors\MediafileBehavior;
  */
 class Products extends \yii\db\ActiveRecord
 {
+  
+  public static function getDb() {
+      return Yii::$app->db;
+  }
   const STATUS_INACTIVE = 0;
   const STATUS_ACTIVE = 1;
 

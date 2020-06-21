@@ -6,6 +6,9 @@ use Yii;
 
 class MenuTranslation extends \yii\db\ActiveRecord
 {
+  public static function getDb() {
+        return Yii::$app->db_other;
+    }
   /**
    * @inheritdoc
    */

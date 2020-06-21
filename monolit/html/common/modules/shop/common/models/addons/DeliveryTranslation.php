@@ -6,6 +6,10 @@ use Yii;
 
 class DeliveryTranslation extends \yii\db\ActiveRecord
 {
+  
+  public static function getDb() {
+      return Yii::$app->db_orders;
+  }
   /**
    * @inheritdoc
    */

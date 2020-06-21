@@ -45,6 +45,9 @@ use creocoder\translateable\TranslateableBehavior;
  */
 class Section extends \yii\db\ActiveRecord
 {
+    public static function getDb() {
+        return Yii::$app->db_other;
+    }
     const STATUS_INACTIVE = 0;
     const STATUS_ACTIVE = 1;
 

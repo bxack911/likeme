@@ -3,11 +3,11 @@
 use yii\helpers\Html;
 use kartik\form\ActiveForm;
 use common\models\Pages;
-use common\modules\shop\common\models\Category;
-use common\models\Language;
-use pendalf89\filemanager\widgets\FileInput;
-use pendalf89\filemanager\widgets\TinyMCE;
 use kartik\select2\Select2;
+use common\models\Language;
+use pendalf89\filemanager\widgets\TinyMCE;
+use common\modules\filemanager\widgets\FileInput;
+use common\modules\shop\common\models\Category;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Material */

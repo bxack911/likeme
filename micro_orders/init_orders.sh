@@ -1,0 +1,1 @@
+kubectl apply -f db-deployment.yaml,db-service.yaml,pma-deployment.yaml,pma-service.yaml

@@ -9,7 +9,10 @@ use common\modules\shop\common\models\query\PaysystemsQuery;
 
 class Paysystems extends \yii\db\ActiveRecord
 {
-
+  
+  public static function getDb() {
+      return Yii::$app->db_orders;
+  }
   public $file;
 
   /**

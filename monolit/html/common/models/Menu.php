@@ -7,6 +7,9 @@ use creocoder\translateable\TranslateableBehavior;
 
 class Menu extends \kartik\tree\models\Tree
 {
+  public static function getDb() {
+        return Yii::$app->db_other;
+    }
   /**
    * @inheritdoc
    */

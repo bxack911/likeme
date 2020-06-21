@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-mysql
+spec:
+  selector:
+    matchLabels:
+      app: orders-mysql8
+  template:
+    metadata:
+      labels:
+        app: orders-mysql8
+    spec:
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - image: mysql:8.0
+          imagePullPolicy: Always
+          name: orders-mysql
+          env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: .orders.
+          - name: MYSQL_DATABASE
+            value: orders
+          - name: MYSQL_USER
+            value: db_orders
+          - name: MYSQL_PASSWORD
+            value: .prods
+          args: ["--default-authentication-plugin=mysql_native_password"]
+          ports:
+          - containerPort: 3306
+          name: orders-mysql8
+          volumeMounts:
+          - name: dbvol
+            mountPath: /var/lib/mysql
+      volumes:
+        - name: dbvol
+          hostPath:
+            path: /data/micro_orders/db/

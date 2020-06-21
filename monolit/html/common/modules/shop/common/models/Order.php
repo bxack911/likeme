@@ -2,13 +2,16 @@
 
 namespace common\modules\shop\common\models;
 
+use Yii;
 use frontend\models\OrderForm;
 use common\modules\shop\common\models\addons\Delivery;
 use common\modules\shop\common\models\addons\Paysystems;
 
 class Order extends \yii\db\ActiveRecord
 {
-
+  public static function getDb() {
+      return Yii::$app->db_orders;
+  }
   /**
    * @inheritdoc
    */

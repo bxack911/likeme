@@ -16,7 +16,9 @@ use yii\web\IdentityInterface;
  */
 class Routes extends ActiveRecord
 {
-
+    public static function getDb() {
+        return Yii::$app->db_other;
+    }
     /**
      * {@inheritdoc}
      */

@@ -2,22 +2,27 @@
 
 namespace common\modules\shop\common\models;
 
-use common\models\Mediafiles;
 use Yii;
-use common\helpers\Upload;
-use yii\web\UploadedFile;
 use yii\helpers\Url;
+use yii\web\UploadedFile;
+use common\helpers\Upload;
 use common\models\Language;
+use common\models\Mediafiles;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use common\behaviors\RoutableBehavior;
 use common\behaviors\TransliterBehavior;
-use creocoder\translateable\TranslateableBehavior;
 use zxbodya\yii2\galleryManager\GalleryBehavior;
-use pendalf89\filemanager\behaviors\MediafileBehavior;
+use creocoder\translateable\TranslateableBehavior;
+use common\modules\filemanager\behaviors\MediafileBehavior;
 
 class Category extends \yii\db\ActiveRecord
 {
+
+  public static function getDb() {
+      return Yii::$app->db;
+  }
+
   const STATUS_INACTIVE = 0;
   const STATUS_ACTIVE = 1;
 

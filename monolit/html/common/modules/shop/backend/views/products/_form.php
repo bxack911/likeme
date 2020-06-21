@@ -2,14 +2,14 @@
 
 use yii\helpers\Html;
 use yii\helpers\Url;
+use common\models\Language;
 use kartik\form\ActiveForm;
+use kartik\select2\Select2;
+use pendalf89\filemanager\widgets\TinyMCE;
 use common\modules\shop\common\models\Category;
 use common\modules\shop\common\models\Products;
 use common\modules\shop\common\models\Properties;
-use common\models\Language;
-use pendalf89\filemanager\widgets\FileInput;
-use pendalf89\filemanager\widgets\TinyMCE;
-use kartik\select2\Select2;
+use common\modules\filemanager\widgets\FileInput;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Material */

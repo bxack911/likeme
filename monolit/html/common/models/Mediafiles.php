@@ -23,6 +23,9 @@ use yii\helpers\Url;
  */
 class Mediafiles extends \yii\db\ActiveRecord
 {
+    public static function getDb() {
+        return Yii::$app->db;
+    }
     /**
      * @inheritdoc
      */
