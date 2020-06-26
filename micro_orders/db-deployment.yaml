@@ -15,19 +15,19 @@ spec:
         runAsUser: 1000
         fsGroup: 1000
       containers:
-        - image: mysql:8.0
+        - image: mysql:8
           imagePullPolicy: Always
           name: orders-mysql
           env:
           - name: MYSQL_ROOT_PASSWORD
             value: .orders.
           - name: MYSQL_DATABASE
-            value: orders
+            value: products
           - name: MYSQL_USER
-            value: db_orders
+            value: db_products
           - name: MYSQL_PASSWORD
             value: .prods
-          args: ["--default-authentication-plugin=mysql_native_password"]
+          args: ["--skip-name-resolve"]
           ports:
           - containerPort: 3306
           name: orders-mysql8

@@ -43,7 +43,13 @@ func GetProducts(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
     }
     defer db.Close()
 
-    // Execute the query
+    redis_con, redis_err := redis.Dial(RedisProtocol, RedisHost)
+    if redis_err != nil {
+        log.Fatal(redis_err)
+    }
+    defer redis_con.Close()
+
+
     results, err := db.Query("SELECT products.id,products.quantity,products.slug,products.category,products.price,products.discount,products.discount_type,products.is_new,products.status,products.articul, " +
         "products_translation.title AS title, products_translation.description AS description, products_translation.short_description AS short_description, " +
         "filemanager_mediafile.url AS image " +
@@ -65,12 +71,6 @@ func GetProducts(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
         if err != nil {
             panic(err.Error())
         }
-
-        redis_con, redis_err := redis.Dial(RedisProtocol, RedisHost)
-        if redis_err != nil {
-            log.Fatal(redis_err)
-        }
-        defer redis_con.Close()
 
         ip,_,_ := net.SplitHostPort(r.RemoteAddr)
         

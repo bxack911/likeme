@@ -16,6 +16,7 @@ func main() {
     router.GET("/get-cats/:language/:parent", GetCats)
     router.GET("/get-products/:language/:category", GetProducts)
     router.GET("/get-filters/:language/:category", GetFilters)
+    router.GET("/get-cart/:user/:product/:language", CartIncrease)
 
     http.ListenAndServe(":8081", router)
 

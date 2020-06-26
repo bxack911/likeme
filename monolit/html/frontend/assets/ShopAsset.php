@@ -9,10 +9,11 @@ use yii\web\AssetBundle;
  */
 class ShopAsset extends AssetBundle
 {
-    public $publishOptions = ['forceCopy' => true];
+    //public $publishOptions = ['forceCopy' => true];
     public $sourcePath = '@frontend/web/source/';
 
     public $css = [
+        'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css',
         'sass/vendor/zoomOnHover.css',
         'sass/vendor/owl.carousel.min.css',
         'styles/css-min/main.min.css',
