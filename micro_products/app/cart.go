@@ -20,25 +20,56 @@ type CartRedis struct {
     UserIp int `json:"user_ip"`
 }
 
-func SetCartArray(quantity int,product_id string, ps httprouter.Params){
-    redis_con,redis_err := redis.Dial(RedisProtocol, RedisHost)
+func Cartung(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+    w.Header().Set("Access-Control-Allow-Origin", "*")
 
-    if redis_err != nil {
-        panic(redis_err.Error())
-    }
-
-    _, cart_quantity_err := redis_con.Do("HSET","__CART__"+ ps.ByName("user") +"__"  + ps.ByName("product") + "__", "quantity",strconv.Itoa(quantity+1))
-    if cart_quantity_err != nil {
-        panic(cart_quantity_err.Error())
-    }
-
-    _, cart_product_id_err := redis_con.Do("HSET","__CART__"+ ps.ByName("user") +"__"  + ps.ByName("product") + "__", "product_id",product_id)
-    if cart_product_id_err != nil {
-        panic(cart_product_id_err.Error())
-    }
+    fmt.Fprintf(w, getCartArray(ps.ByName("user"),ps.ByName("language"),w))
 }
 
-func CartIncrease(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func ClearCart(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+    redis_con, redis_err := redis.Dial(RedisProtocol, RedisHost)
+    if redis_err != nil {
+        log.Fatal(redis_err)
+    }
+    defer redis_con.Close()
+
+    products_arr, products_arr_err := redis.Strings(redis_con.Do("KEYS","*__CART__"+ps.ByName("user")+"__*"))
+    if products_arr_err != nil {
+        panic(products_arr_err)
+    }
+
+    if products_arr != nil {
+        for _, key := range products_arr {
+            _, cart_arr_err := redis_con.Do("DEL",key)
+            if cart_arr_err != nil {
+                panic(cart_arr_err)
+            }
+        }
+    }
+
+    fmt.Fprintf(w, getCartArray(ps.ByName("user"),ps.ByName("language"),w))
+}
+
+func DeleteCart(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+
+    redis_con, redis_err := redis.Dial(RedisProtocol, RedisHost)
+    if redis_err != nil {
+        log.Fatal(redis_err)
+    }
+    defer redis_con.Close()
+
+    _, cart_arr_err := redis_con.Do("DEL","__CART__"+ps.ByName("user")+"__"+ps.ByName("product")+"__")
+
+    if cart_arr_err != nil {
+        panic(cart_arr_err)
+    }
+
+    fmt.Fprintf(w, getCartArray(ps.ByName("user"),ps.ByName("language"),w))
+}
+
+func CartService(w http.ResponseWriter, r *http.Request, ps httprouter.Params){
     w.Header().Set("Access-Control-Allow-Origin", "*")
     redis_con,redis_err := redis.Dial(RedisProtocol, RedisHost)
 
@@ -60,14 +91,79 @@ func CartIncrease(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
         quantity = 0
     }
 
+    switch ps.ByName("type") {
+        case "increase":
+            if quantity > 0 {
+                CartIncrease(quantity,ps.ByName("product"), ps.ByName("user"))
+            }else{
+                CartIncrease(0,ps.ByName("product"), ps.ByName("user"))
+            }
+        case "decrease":
+            if quantity > 0 {
+                CartDecrease(quantity,ps.ByName("product"), ps.ByName("user"))
+            }
+        case "sum":
+            sum,_ := strconv.Atoi(ps.ByName("sum"))
+            if sum > 0 {
+                CartSum(quantity,ps.ByName("product"), ps.ByName("user"), ps.ByName("sum"))
+            }
+    }
 
-    if quantity > 0{
-        SetCartArray(quantity,ps.ByName("user"), ps)
-        fmt.Fprintf(w, getCartArray(ps.ByName("user"),ps.ByName("language"),w))
-      //return getCartArray($param);
-    }else{
-        SetCartArray(1,ps.ByName("user"), ps)
-        fmt.Fprintf(w, getCartArray(ps.ByName("user"),ps.ByName("language"),w))
+    fmt.Fprintf(w, getCartArray(ps.ByName("user"),ps.ByName("language"),w))
+}
+
+
+func CartIncrease(quantity int, product_id string, user string) {
+    redis_con,redis_err := redis.Dial(RedisProtocol, RedisHost)
+
+    if redis_err != nil {
+        panic(redis_err.Error())
+    }
+
+    _, cart_quantity_err := redis_con.Do("HSET","__CART__"+ user +"__"  + product_id + "__", "quantity",strconv.Itoa(quantity+1))
+    if cart_quantity_err != nil {
+        panic(cart_quantity_err.Error())
+    }
+
+    _, cart_product_id_err := redis_con.Do("HSET","__CART__"+ user +"__"  + product_id + "__", "product_id",product_id)
+    if cart_product_id_err != nil {
+        panic(cart_product_id_err.Error())
+    }
+}
+
+func CartDecrease(quantity int, product_id string, user string) {
+    redis_con,redis_err := redis.Dial(RedisProtocol, RedisHost)
+
+    if redis_err != nil {
+        panic(redis_err.Error())
+    }
+
+    _, cart_quantity_err := redis_con.Do("HSET","__CART__"+ user +"__"  + product_id + "__", "quantity",strconv.Itoa(quantity-1))
+    if cart_quantity_err != nil {
+        panic(cart_quantity_err.Error())
+    }
+
+    _, cart_product_id_err := redis_con.Do("HSET","__CART__"+ user +"__"  + product_id + "__", "product_id",product_id)
+    if cart_product_id_err != nil {
+        panic(cart_product_id_err.Error())
+    }
+}
+
+func CartSum(quantity int, product_id string, user string, sum string) {
+    redis_con,redis_err := redis.Dial(RedisProtocol, RedisHost)
+
+    if redis_err != nil {
+        panic(redis_err.Error())
+    }
+
+    _, cart_quantity_err := redis_con.Do("HSET","__CART__"+ user +"__"  + product_id + "__", "quantity",sum)
+    if cart_quantity_err != nil {
+        panic(cart_quantity_err.Error())
+    }
+
+    _, cart_product_id_err := redis_con.Do("HSET","__CART__"+ user +"__"  + product_id + "__", "product_id",product_id)
+    if cart_product_id_err != nil {
+        panic(cart_product_id_err.Error())
     }
 }
 
@@ -164,7 +260,7 @@ func getCartArray(user_ip string,language string,w http.ResponseWriter,)(returne
         returned_json  = string(pagesJson)
         return returned_json
     }else{
-        returned_json = "ttt"
+        returned_json = "null"
         return returned_json
     }
 }

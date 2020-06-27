@@ -108,19 +108,19 @@
       },
       add(index,id) {
         this.quantity = document.querySelector('#product_quantity' + index).value;
-        axios.get('/shop/cart/sum/'+id+'/' + this.quantity).then((response) => {
+        axios.get('http://172.17.0.3:30101/get-cart/1/'+id+'/ru/sum/'+this.quantity).then((response) => {
           this.$root.reloadCartung();
           this.get_cart();
         });
       },
       delete_prod(index,id) {
-        axios.get('/shop/cart/clear/' + id).then((response) => {
+        axios.get('http://172.17.0.3:30101/delete-cart/1/' + id + "/ru").then((response) => {
           this.$root.reloadCartung();
           this.get_cart();
         });
       },
       get_cart() {
-        axios.get('/shop/cart/cartung').then((response) => {
+        axios.get('http://172.17.0.3:30101/get-cartung/1/ru').then((response) => {
           var data = JSON.parse(response.data);
           this.cart = data.cart;
           this.quantity = data.products.length;

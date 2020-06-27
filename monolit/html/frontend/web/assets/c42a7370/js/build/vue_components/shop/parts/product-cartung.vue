@@ -63,7 +63,7 @@
       add() {
         this.quantity = document.querySelector('#product_quantity').value;
 
-        axios.get('/shop/cart/sum/'+this.product+'/' + this.quantity).then((response) => {
+        axios.get('http://172.17.0.3:30101/get-cart/1/'+this.product+'/ru/sum/' + this.quantity).then((response) => {
           document.querySelector('.modal--product_added').setAttribute("style", 'display: block');
           document.querySelector('.overlay').setAttribute("style", 'display: block');
           this.$root.reloadCartung();

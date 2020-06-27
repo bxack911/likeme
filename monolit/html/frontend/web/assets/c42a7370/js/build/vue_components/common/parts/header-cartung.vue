@@ -67,15 +67,16 @@
     },
     methods: {
       get_cart() {
-        axios.get('/shop/cart/cartung').then((response) => {
-          var data = JSON.parse(response.data);
+        axios.get('http://172.17.0.3:30101/get-cartung/1/ru').then((response) => {
+          console.log(response.data);
+          var data = response.data;
           this.cart = data.cart;
           this.products = new Array(data.products.length);
           this.products = data.products;
         });
       },
       clear_cart(id) {
-        axios.get('/shop/cart/clear/' + id).then((response) => {
+        axios.get('http://172.17.0.3:30101/delete-cart/1/'+id+'/ru').then((response) => {
           this.$root.clearCartung();
         });
       },
