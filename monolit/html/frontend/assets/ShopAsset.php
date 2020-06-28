@@ -9,7 +9,7 @@ use yii\web\AssetBundle;
  */
 class ShopAsset extends AssetBundle
 {
-    public $publishOptions = ['forceCopy' => true];
+    //public $publishOptions = ['forceCopy' => true];
     public $sourcePath = '@frontend/web/source/';
 
     public $css = [

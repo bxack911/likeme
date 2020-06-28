@@ -4,6 +4,8 @@ namespace frontend\models;
 
 use yii\base\Model;
 use yii\helpers\Url;
+use common\modules\shop\common\models\OrderCart;
+use common\modules\shop\common\models\Products;
 
 class OrderForm extends Model
 {
@@ -47,11 +49,21 @@ class OrderForm extends Model
   public function set($id)
   {
     $storage = \yii::$app->redis;
-    $query = $storage->KEYS('*'.$_SERVER['REMOTE_ADDR'].'*');
-    $cart = \yii::$container->get('Cart');
+    $query = $storage->KEYS('*__CART__1__*');
 
     foreach($query as $prod) {
-      $cart::setOrder($id,$prod);
+      $quantity = $storage->hget($prod,"quantity");
+      $product_id = $storage->hget($prod,"product_id");
+
+      if($product = Products::find()->where(['id' => $product_id])->one()){
+        $cartung = new OrderCart();
+        $cartung->order_id = $id;
+        $cartung->product_id = $product_id;
+        $cartung->sum = (string)(intval($product->price) * $quantity);
+        $cartung->sum_discount = (string)(intval($product->getDiscount('sum')) * $quantity);
+        $cartung->quantity = $quantity;
+        $cartung->save();
+      }
       $storage->del($prod);
     }
 

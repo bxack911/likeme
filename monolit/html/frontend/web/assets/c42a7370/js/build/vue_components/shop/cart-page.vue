@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="notice notice--warning js-cart-notice" v-if="quantity == 0">
+    <div class="notice notice--warning js-cart-notice" v-if="products == 0">
       В вашей корзине нет товаров
     </div>
-    <div class="cart-table_container" v-if="quantity > 0">
+    <div class="cart-table_container" v-if="products != 0">
       <div class="cart-items_list lg-grid-8 sm-grid-12 padded-inner-right sm-padded-zero">
         <div id="cart_order_line_268276726" class="cart_item grid-inline grid-inline-middle padded-inner-bottom" v-for="(product,index) in products">
           <div class="cart_item-image lg-grid-2 mc-grid-4 sm-padded-sides sm-padded-bottom">
@@ -61,10 +61,10 @@
         </div>
 
 
-        <div class="cart_total">
+        <div class="cart_total" v-if="cart != 0">
           <div class="cart_total-title">Итого:</div>
           <div class="cart_total-price prices-current js-cart-total">
-            {{ cart[0].sum }} грн.
+            {{ cart.sum }} грн.
           </div>
         </div>
 
@@ -121,11 +121,15 @@
       },
       get_cart() {
         axios.get('http://172.17.0.3:30101/get-cartung/1/ru').then((response) => {
-          var data = JSON.parse(response.data);
-          this.cart = data.cart;
-          this.quantity = data.products.length;
-          this.products = new Array(data.products.length);
-          this.products = data.products;
+          var data = response.data;
+          if(data[0] != undefined && data[1] != undefined){
+            this.products = new Array(data[0].length);
+            this.products = data[0];
+            this.cart = data[1][1];
+          }else{
+            this.products = 0;
+            this.cart = 0;
+          }
         });
       },
     },

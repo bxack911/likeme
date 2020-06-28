@@ -74,7 +74,7 @@
       }
     },
     mounted() {
-      axios.get('/shop/cart/quantity/' + this.product).then((response) => {
+      axios.get('http://172.17.0.3:30101/get-quantity/1/' + this.product).then((response) => {
         if(response.data !== null) this.quantity = response.data;
       });
     }

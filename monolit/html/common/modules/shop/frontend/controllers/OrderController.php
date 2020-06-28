@@ -4,8 +4,8 @@ namespace common\modules\shop\frontend\controllers;
 
 use Yii;
 use yii\web\Controller;
-use yii\web\NotFoundHttpException;
 use common\models\Pages;
+use yii\web\NotFoundHttpException;
 use common\helpers\BreadcrumbsHelper;
 use common\modules\shop\common\models\Order;
 setlocale(LC_ALL, 'ru_RU.UTF-8');

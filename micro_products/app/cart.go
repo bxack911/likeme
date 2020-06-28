@@ -20,6 +20,23 @@ type CartRedis struct {
     UserIp int `json:"user_ip"`
 }
 
+func CartQuantity(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+
+    redis_con, redis_err := redis.Dial(RedisProtocol, RedisHost)
+    if redis_err != nil {
+        log.Fatal(redis_err)
+    }
+    defer redis_con.Close()
+
+    cart_quantity,cart_quantity_err := redis.String(redis_con.Do("HGET","__CART__"+ ps.ByName("user") +"__"  + ps.ByName("product") + "__", "quantity"))
+    if cart_quantity_err != nil {
+        panic(cart_quantity_err)
+    }
+
+    fmt.Fprintf(w, cart_quantity)
+}
+
 func Cartung(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
     w.Header().Set("Access-Control-Allow-Origin", "*")
 
@@ -183,13 +200,18 @@ func getCartArray(user_ip string,language string,w http.ResponseWriter,)(returne
 
     products_arr, products_arr_err := redis.Strings(redis_con.Do("KEYS","*__CART__"+user_ip+"__*"))
     if products_arr_err != nil {
-        fmt.Fprintf(w, "test")
+        panic(products_arr_err)
     }
 
-    products := make(map[int]map[string]string)
+    var products [2]map[int]map[string]string
+
+    products[0] = make(map[int]map[string]string)
+    products[1] = make(map[int]map[string]string)
 
     if products_arr != nil {
         counter := 0
+        cart_sum := 0
+        cart_all_quantity := 0
         for _, key := range products_arr {
             var tag ProductsTable
             var redis_cart CartRedis
@@ -199,7 +221,13 @@ func getCartArray(user_ip string,language string,w http.ResponseWriter,)(returne
                 panic(cart_product_err_id.Error())
             }
 
+            cart_quantity,cart_quantity_err := redis.String(redis_con.Do("HGET",key,"quantity"))
+            if cart_quantity_err != nil {
+                panic(cart_quantity_err.Error())
+            }
+
             redis_cart.ID, _ = strconv.Atoi(cart_product_id)
+            redis_cart.Quantity, _ = strconv.Atoi(cart_quantity)
 
             product_row := db.QueryRow("SELECT products.id,products.quantity,products.slug,products.category,products.price,products.discount,products.discount_type,products.is_new,products.status,products.articul, " +
             "products_translation.title AS title, products_translation.description AS description, products_translation.short_description AS short_description, " +
@@ -229,9 +257,13 @@ func getCartArray(user_ip string,language string,w http.ResponseWriter,)(returne
 
             tag.Link = "/" + getCatLink(tag.Category,w) + "/" + tag.Slug
 
-            products[counter] = map[string]string{
+            cart_sum += tag.Price * redis_cart.Quantity
+            cart_all_quantity += redis_cart.Quantity
+
+            products[0][counter] = map[string]string{
                 "id":strconv.Itoa(tag.ID),
-                "quantity":strconv.Itoa(tag.Quantity),
+                "product_id": strconv.Itoa(tag.ID),
+                "quantity":strconv.Itoa(redis_cart.Quantity),
                 "slug":tag.Slug,
                 "category":strconv.Itoa(tag.Category),
                 "price":strconv.Itoa(tag.Price),
@@ -247,11 +279,16 @@ func getCartArray(user_ip string,language string,w http.ResponseWriter,)(returne
                 "image":tag.Image,
                 "image2":GetProductsImage2(tag.ID,w),
                 "link":tag.Link,
+                "sum": strconv.Itoa(tag.Price * redis_cart.Quantity),
                 "favourite":strconv.FormatBool(tag.Favourite),
             }
             counter++
         }
 
+        products[1][1] = map[string]string{
+            "sum": strconv.Itoa(cart_sum),
+            "product_quantity": strconv.Itoa(cart_all_quantity),
+        }
 
         pagesJson, err := json.Marshal(products)
         if err != nil {

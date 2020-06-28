@@ -46,25 +46,25 @@ $order = $model->initialize($model->id);
                 <thead>
                 <tr>
                   <td>Наименование</td>
-                  <td>Количество</td>
                   <td>Цена товара</td>
+                  <td>Количество</td>
                   <td>Стоимость</td>
                 </tr>
                 </thead>
                 <tbody>
-                  <?php foreach($order['cart']->products as $product): ?>
+                  <?php foreach($order['cart'] as $cart_item): ?>
                     <tr>
-                      <td><?= $product->title ?></td>
-                      <td><?= $product->quantity ?></td>
-                      <td><?= $product->price ?> грн.</td>
-                      <td><?= $product->sum ?> грн.</td>
+                      <td><?= $cart_item->getProduct($cart_item->product_id)->title ?></td>
+                      <td><?= $cart_item->getProduct($cart_item->product_id)->price?> грн.</td>
+                      <td><?= $cart_item->quantity ?></td>
+                      <td><?= $cart_item->sum ?> грн.</td>
                     </tr>
                   <?php endforeach ?>
                 <tr>
                   <td></td>
                   <td></td>
                   <td></td>
-                  <td class="pull-right"><p><strong>Итого:</strong></p><?= $order['cart']->cart[0]->sum ?> грн.</td>
+                  <td class="pull-right"><p><strong>Итого:</strong></p><?= $order['full_cart_sum'] ?> грн.</td>
                 </tr>
                 </tbody>
               </table>

@@ -20,6 +20,7 @@ func main() {
     router.GET("/clear-cart/:user/:language", ClearCart)
     router.GET("/delete-cart/:user/:product/:language", DeleteCart)
     router.GET("/get-cartung/:user/:language", Cartung)
+    router.GET("/get-quantity/:user/:product", CartQuantity)
 
     http.ListenAndServe(":8081", router)
 

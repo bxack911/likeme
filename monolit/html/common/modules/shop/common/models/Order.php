@@ -59,7 +59,8 @@ class Order extends \yii\db\ActiveRecord
   {
     $paysystems = Paysystems::getPaysystems();
     $deliveries= Delivery::getDeliveries();
-    $cart = ($order_id) ? json_decode(\yii::$container->get('Cart')->getCartArray(null,$order_id)) : json_decode(\yii::$container->get('Cart')->getCartArray());
+    $cart = OrderCart::find()->where(['order_id' => $order_id])->all();
+    $full_cart_sum = OrderCart::find()->where(['order_id' => $order_id])->sum('sum');
 
     $orderForm = new OrderForm();
 
@@ -82,13 +83,15 @@ class Order extends \yii\db\ActiveRecord
 
     $paysystem = Paysystems::find()->where(['id' => $order->paysystem_id])->one();
     $delivery = Delivery::find()->where(['id' => $order->delivery_id])->one();
-    $cart = json_decode(\yii::$container->get('Cart')->getCartArray(null, $id));
+    $cart = OrderCart::find()->where(['order_id' => $id])->all();
+    $full_cart_sum = OrderCart::find()->where(['order_id' => $id])->sum('sum');
 
     return [
       'order' => $order,
       'paysystem' => $paysystem,
       'delivery' => $delivery,
-      'cart' => $cart
+      'cart' => $cart,
+      'full_cart_sum' => $full_cart_sum,
     ];
   }
 

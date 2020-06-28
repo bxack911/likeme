@@ -39,7 +39,7 @@
 
           <div class='co-order-information_row'>
             <div class='co-order-information_title'>Получатель</div>
-            <div class='co-order-information_value'><?= $model['order']->fio ?> <?= $model['order']->phone ?></div>
+            <div class='co-order-information_value'><?= $model['order']->fio ?> <a href="tel:<?= str_replace('(','',str_replace(')','',str_replace(' ','',$model['order']->phone))) ?>"><?= $model['order']->phone ?></a></div>
           </div>
 
         </div>
@@ -48,20 +48,22 @@
           <tr class='co-table-row co-table-row--head'>
             <td class='co-table-cell co-table-cell--head'>Наименование</td>
             <td class='co-table-cell co-table-cell--head'>Кол-во</td>
+            <td class='co-table-cell co-table-cell--head'>Скидка</td>
             <td class='co-table-cell co-table-cell--head'>Стоимость</td>
           </tr>
-          <?php foreach($model['cart']->products as $product): ?>
+          <?php foreach($model['cart'] as $cart_item): ?>
             <tr class='co-table-row co-table-row--body co-table-row--striped'>
-              <td class='co-table-cell co-table-cell--body' data-title='Наименование'><?= $product->title ?></td>
-              <td class='co-table-cell co-table-cell--body' data-title='Кол-во'><?= $product->quantity ?></td>
-              <td class='co-table-cell co-table-cell--body' data-title='Стоимость'><?= $product->sum ?> грн.</td>
+              <td class='co-table-cell co-table-cell--body' data-title='Наименование'><?= $cart_item->getProduct($cart_item->product_id)->title ?></td>
+              <td class='co-table-cell co-table-cell--body' data-title='Кол-во'><?= $cart_item->quantity ?></td>
+              <td class='co-table-cell co-table-cell--body' data-title='Скидка'><?= $cart_item->sum - $cart_item->sum_discount ?> грн.</td>
+              <td class='co-table-cell co-table-cell--body' data-title='Стоимость'><?= $cart_item->sum_discount ?> грн.</td>
             </tr>
           <?php endforeach ?>
 
           <tr class='co-table-row co-table-row--foot'>
-            <td class='co-table-cell co-table-cell--foot' colspan='3'>
+            <td class='co-table-cell co-table-cell--foot' colspan='4'>
               <div class='co-order_history-total_title'>Итого:</div>
-              <div class='co-order_history-total_sum co-price'><?= $model['cart']->cart[0]->sum ?> грн.</div>
+              <div class='co-order_history-total_sum co-price'><?= $model['full_cart_sum'] ?> грн.</div>
             </td>
           </tr>
         </table>
