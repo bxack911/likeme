@@ -634,7 +634,6 @@
 
   img {
     border: 0;
-    max-width: 100%;
   }
 
   svg:not(:root) {
@@ -2507,12 +2506,6 @@
   }
 
   /**/
-
-  img {
-    vertical-align: middle;
-    max-width: 100%;
-    max-height: 100%;
-  }
 
   .image-square, .image-circle {
     display: block;

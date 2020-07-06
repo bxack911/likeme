@@ -11,7 +11,7 @@
               <div class="slider-text-inner">
                 <div class="slider-text-top">{{ slide.title }}</div>
                 <div class="slider-text-center">{{ slide.html }}</div>
-                <div class="slider-text-btn button">{{ translations.button }}</div>
+                <div class="slider-text-btn button">{{ getTranslation('To catalog') }}</div>
               </div>
             </div>
             <div class="slider-image">
@@ -33,6 +33,7 @@
     name: "slider",
     data() {
       return {
+        showing: false,
         slides: [],
         translations: [],
       }
@@ -59,23 +60,24 @@
       },
       get_slider(){
         axios
-          .get('http://172.17.0.3:30201/get-units/ru/1')
+          .get(this.$microservices_url + this.$micro_others_port + '/get-units/ru/1')
           .then((response) => {
             this.slides = new Array(response. data.length);
             this.slides = response.data;
           });
       },
-      get_translations() {
-        var object = this;
-        axios.get('/vue/slider-translations')
-        .then((r) => {
-          this.translations = new Array(r.data.length);
-          this.translations = r.data;
+      getTranslations: function() {
+        axios.get(this.$microservices_url + this.$micro_others_port + '/get-translations').then((response) => {
+          this.translations = response.data;
+          this.showing = true;
         });
+      },
+      getTranslation: function(key) {
+        return JSON.parse(this.translations[key].value)[this.$language];
       },
     },
     mounted: function() {
-      this.get_translations();
+      this.getTranslations();
       this.get_slider();
       setTimeout(() => {
         this.owl_init();

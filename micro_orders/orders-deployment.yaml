@@ -19,6 +19,9 @@ spec:
         image: golang:1.14.3-alpine3.11
         imagePullPolicy: Always
         command: ["/bin/sh","-c","cd /app && go build -o main . && /app/main"]
+        env:
+          - name: K8S_HOST
+            value: "192.168.39.195"
         ports:
         - containerPort: 8081
         volumeMounts:

@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div v-if="showing">
     <div class="notice notice--warning js-cart-notice" v-if="products == 0">
-      В вашей корзине нет товаров
+      {{ getTranslation('There are no products in your shopping cart') }}
     </div>
     <div class="cart-table_container" v-if="products != 0">
       <div class="cart-items_list lg-grid-8 sm-grid-12 padded-inner-right sm-padded-zero">
@@ -15,19 +15,19 @@
             <a :href="product.link" class="cart_item-link">
               {{ product.title }}
             </a>
-            <div class="cart_item-sku">арт. {{ product.articul }}</div>
+            <div class="cart_item-sku">{{ getTranslation('art') }}. {{ product.articul }}</div>
 
           </div>
 
           <div class="cart_item-title lg-grid-1 sm-grid-1 mc-grid-r lg-padded-sides xs-padded-sides">
-            {{ product.price }} грн.
+            {{ product.price }} {{ getTranslation('grn') }}.
           </div>
 
           <div class="cart_item-quantity-seperator lg-grid-1 sm-grid-1 mc-grid-r lg-padded-sides xs-padded-sides">
             х
           </div>
 
-          <div class="cart_item-quantity lg-grid-3 mc-grid-6 lg-padded-sides center mc-left">
+          <div class="cart_item-quantity lg-grid-2 mc-grid-5 lg-padded-sides center mc-left">
             <div class="quantity quantity--side">
               <input :id="'product_quantity'+index" type="text" class="quantity-input js-quantity-input" :value="products[index].quantity" v-on:keyup="sum(index,product.id)" />
               <div class="quantity-button quantity-button--minus button js-quantity-minus" v-on:click="decrease(index,product.id)">-</div>
@@ -37,13 +37,13 @@
 
           <div class="cart_item-prices cart_item-prices--stock lg-grid-2 sm-grid-3 mc-grid-5 lg-padded-sides center">
             <span class="prices-current js-price_type-268276726">
-              {{ product.sum }} грн
+              {{ product.sum }} {{ getTranslation('grn') }}
             </span>
           </div>
 
           <div class="cart_item-delete lg-grid-1 mc-grid-3 lg-padded-sides right">
             <a class="js-cart_item-delete" title="Удалить из корзины" v-on:click="delete_prod(index,product.id)">
-              <img src="https://assets3.insales.ru/assets/1/7887/1285839/1586265738/cross_icon.svg">
+              <img src="/storage/icons/cross_icon.svg">
             </a>
           </div>
         </div>
@@ -86,6 +86,8 @@
     data() {
       return {
         cart: [],
+        showing: false,
+        translations: [],
         products: [],
         quantity: 0,
       }
@@ -108,19 +110,19 @@
       },
       add(index,id) {
         this.quantity = document.querySelector('#product_quantity' + index).value;
-        axios.get('http://172.17.0.3:30101/get-cart/1/'+id+'/ru/sum/'+this.quantity).then((response) => {
+        axios.get(this.$microservices_url + this.$micro_products_port + '/get-cart/1/'+id+'/ru/sum/'+this.quantity).then((response) => {
           this.$root.reloadCartung();
           this.get_cart();
         });
       },
       delete_prod(index,id) {
-        axios.get('http://172.17.0.3:30101/delete-cart/1/' + id + "/ru").then((response) => {
+        axios.get(this.$microservices_url + this.$micro_products_port + '/delete-cart/1/' + id + "/ru").then((response) => {
           this.$root.reloadCartung();
           this.get_cart();
         });
       },
       get_cart() {
-        axios.get('http://172.17.0.3:30101/get-cartung/1/ru').then((response) => {
+        axios.get(this.$microservices_url + this.$micro_products_port + '/get-cartung/1/ru').then((response) => {
           var data = response.data;
           if(data[0] != undefined && data[1] != undefined){
             this.products = new Array(data[0].length);
@@ -132,8 +134,18 @@
           }
         });
       },
+      getTranslations: function() {
+        axios.get(this.$microservices_url + this.$micro_others_port + '/get-translations').then((response) => {
+          this.translations = response.data;
+          this.showing = true;
+        });
+      },
+      getTranslation: function(key) {
+        return JSON.parse(this.translations[key].value)[this.$language];
+      },
     },
     mounted() {
+      this.getTranslations();
       this.get_cart();
     }
   }

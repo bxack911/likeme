@@ -70,7 +70,7 @@ return [
     ],
     'components' => [
         'assetManager' => [
-            'linkAssets' => false,
+            'linkAssets' => true,
         ],
         'request' => [
             'csrfParam' => '_csrf-backend',

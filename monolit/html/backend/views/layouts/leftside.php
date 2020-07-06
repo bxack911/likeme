@@ -161,6 +161,11 @@ use Yii\helpers\Url;
                             <span>Типы блоков с наполнением</span>
                         </a>
                     </li>
+                  <li>
+                    <a href="<?= Url::to(['/strings']) ?>">
+                      <span>Переводы</span>
+                    </a>
+                  </li>
                 </ul>
             </li>
             <li>

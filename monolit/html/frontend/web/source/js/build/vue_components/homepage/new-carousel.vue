@@ -1,10 +1,10 @@
 <template>
-  <div class="index">
+  <div class="index" v-if="showing">
     <div class="slider slider--product slider--index_product">
 
       <div class="titler">
         <a href="/collection/frontpage">
-          Новые поступления
+          {{ getTranslation('New Arrivals') }}
         </a>
       </div>
 
@@ -31,7 +31,9 @@
     },
     data() {
       return {
-        products: []
+        products: [],
+        showing: false,
+        translations: [],
       }
     },
     methods: {
@@ -65,9 +67,19 @@
           navText: ['<i class="fa fa-angle-left" />', '<i class="fa fa-angle-right" />'],
           navContainerClass: 'slider-control--product',
         });
-      }
+      },
+      getTranslations: function() {
+        axios.get(this.$microservices_url + this.$micro_others_port + '/get-translations').then((response) => {
+          this.translations = response.data;
+          this.showing = true;
+        });
+      },
+      getTranslation: function(key) {
+        return JSON.parse(this.translations[key].value)[this.$language];
+      },
     },
     created() {
+      this.getTranslations();
       this.get_products();
     },
   }

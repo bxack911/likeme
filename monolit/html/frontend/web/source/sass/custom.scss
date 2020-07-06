@@ -35,6 +35,11 @@ label{
   text-align: center;
   font-weight: 700;
 }
+.basket_item,.cart_item{
+  img{
+    max-width: 100%;
+  }
+}
 .js-search_widget-wrapper{
   z-index: 9;
   .header_search_results{
@@ -51,6 +56,9 @@ label{
       .img{
         width: 10%;
         margin-right: 20px;
+        img{
+          max-width: 100%;
+        }
       }
       .medium{
         display: flex;

@@ -23,7 +23,7 @@
     props: ['category'],
     methods: {
       get_child() {
-        axios.get('http://172.17.0.3:30101/get-cats/ru/' + this.category).then((response) => {
+        axios.get(this.$microservices_url + this.$micro_products_port + '/get-cats/ru/' + this.category).then((response) => {
           this.categories = new Array(response.data.length);
           this.categories = response.data;
         });

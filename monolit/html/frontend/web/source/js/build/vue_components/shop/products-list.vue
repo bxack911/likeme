@@ -29,7 +29,7 @@
     },
     methods: {
       productsList() {
-        var url = (this.category == "favourite") ? '/shop/favourite/favourite' : 'http://172.17.0.3:30101/get-products/ru/' + this.category;
+        var url = (this.category == "favourite") ? '/shop/favourite/favourite' : this.$microservices_url + this.$micro_products_port + '/get-products/ru/' + this.category;
         axios.get(url).then((r) => {
           this.products = new Array(Object.keys(r.data).length);
           this.prod_count = Object.keys(r.data).length;

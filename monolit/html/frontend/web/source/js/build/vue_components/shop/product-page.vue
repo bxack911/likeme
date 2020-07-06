@@ -4,18 +4,17 @@
       <div class="product-gallery gallery">
         <div class="product-gallery--no_touch sm-hidden">
           <div class="gallery-large_image sm-hidden">
-            <zoom-on-hover :img-normal="product[0].image2[0].url" :scale="2"></zoom-on-hover>
+            <zoom-on-hover :img-normal="product.image2" :scale="2"></zoom-on-hover>
           </div>
 
           <div class="slider slider--gallery">
             <ul class="gallery-preview_list gallery-preview_list--horizontal slider-container owl-carousel js-slider--gallery">
-
-              <li class="gallery-preview padded-sides" v-for="gallery in product[0].image2">
-                <a :href="gallery.url" alt="" title=""
+              <li class="gallery-preview padded-sides" v-for="gallery in JSON.parse(product.gallery)">
+                <a :href="gallery.image" alt="" title=""
                    class="gallery-image gallery-image--current image-square"
-                   data-zoom-id="MagicZoom" :data-image="gallery.url"  >
-                  <img :src="gallery.url" class="sm-hidden xs-hidden" />
-                  <img :src="gallery.url" class="js-product_gallery-preview_image lg-hidden md-hidden" />
+                   data-zoom-id="MagicZoom" :data-image="gallery.image"  >
+                  <img :src="gallery.image" class="sm-hidden xs-hidden" />
+                  <img :src="gallery.image" class="js-product_gallery-preview_image lg-hidden md-hidden" />
                 </a>
               </li>
             </ul>
@@ -26,7 +25,7 @@
         <div class="product-gallery--touch slider slider--gallery lg-hidden md-hidden">
           <div class="js-slider--phone_gallery owl-carousel owl-theme">
 
-            <div class="item" v-for="gallery in product[0].image2"><img :src="gallery.url" alt="The Last of us"></div>
+            <div class="item" v-for="gallery in product.image2"><img :src="gallery.url" alt="The Last of us"></div>
 
           </div>
         </div>
@@ -38,11 +37,11 @@
                 lg-grid-6 sm-grid-6 xs-grid-12
                 padded-inner-sides
                 padded-inner-bottom xs-padded-zero-bottom">
-      <h1 class="product-title content-title">{{ product[0].title }}</h1>
+      <h1 class="product-title content-title">{{ product.title }}</h1>
 
 
       <div class="product-short_description editor">
-        <p><span v-html="product[0].short_description"></span></p>
+        <p><span v-html="product.short_description"></span></p>
       </div>
 
 
@@ -50,18 +49,18 @@
       <div class="product-sku js-product-sku">
         Артикул:
         <span class="product-sku_field js-product-sku_field">
-          {{ product[0].articul }}
+          {{ product.articul }}
         </span>
       </div>
 
 
       <div class="product-presence">
         Наличие:
-        <span class="product-presence_field js-product-presence" v-if="product[0].available == 1">Есть в наличии</span>
-        <span class="product-presence_field js-product-presence" v-if="product[0].available == 0"><strong>Нет в наличии</strong></span>
+        <span class="product-presence_field js-product-presence" v-if="product.available == 1">Есть в наличии</span>
+        <span class="product-presence_field js-product-presence" v-if="product.available == 0"><strong>Нет в наличии</strong></span>
       </div>
 
-      <div id="order" v-if="product[0].available == 1">
+      <div id="order" v-if="product.available == 1">
 
 
         <div class="product-variants">
@@ -75,15 +74,15 @@
         </div>
 
 
-        <div class="product-prices prices" v-if="product[0].prod_discount != 0">
-          <span class="prices-old js-prices-old">{{ product[0].price }} грн.</span>
-          <span class="prices-current js-prices-current">{{ product[0].discount_sum }} грн.</span>
+        <div class="product-prices prices" v-if="product.prod_discount != 0">
+          <span class="prices-old js-prices-old">{{ product.price }} грн.</span>
+          <span class="prices-current js-prices-current">{{ product.discount_sum }} грн.</span>
         </div>
-        <div class="product-prices prices" v-if="product[0].prod_discount == 0">
-          <span class="prices-current js-prices-current">{{ product[0].price }} грн.</span>
+        <div class="product-prices prices" v-if="product.prod_discount == 0">
+          <span class="prices-current js-prices-current">{{ product.price }} грн.</span>
         </div>
 
-        <product-cartung :product="product[0].id" ref="product_cart"></product-cartung>
+        <product-cartung :product="product.id" ref="product_cart"></product-cartung>
 
 
       </div>
@@ -95,7 +94,7 @@
           <div class="accordion__item js-accordion-item">
             <div class="accordion-header js-accordion-header">Описание</div>
             <div class="accordion-body js-accordion-body">
-              <div class="accordion-body__contents" v-html="product[0].description">
+              <div class="accordion-body__contents" v-html="product.description">
 
               </div>
             </div>
@@ -109,61 +108,12 @@
               <div class="accordion-body__contents">
                 <table class="product-properties">
 
-                  <tr>
-                    <td class="property-title lg-grid-4 xs-grid-5 mc-grid-12 padded-inner-right mc-padded-zero">Цвет ножек:</td>
-                    <td class="property-values lg-grid-8 xs-grid-7 mc-grid-12 mc-padded-inner-bottom">
+                  <tr v-for="props_cat in JSON.parse(product.props)">
+                    <td class="property-title lg-grid-4 xs-grid-5 mc-grid-12 padded-inner-right mc-padded-zero"><strong>{{ props_cat.name }}:</strong></td>
 
-                      бук
+                    <td class="property-values lg-grid-8 xs-grid-7 mc-grid-12 mc-padded-inner-bottom" v-for="child_props in JSON.parse(props_cat.childs)">
 
-
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td class="property-title lg-grid-4 xs-grid-5 mc-grid-12 padded-inner-right mc-padded-zero">Каркас:</td>
-                    <td class="property-values lg-grid-8 xs-grid-7 mc-grid-12 mc-padded-inner-bottom">
-
-                      массив, мебельный щит
-
-
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td class="property-title lg-grid-4 xs-grid-5 mc-grid-12 padded-inner-right mc-padded-zero">Механизм:</td>
-                    <td class="property-values lg-grid-8 xs-grid-7 mc-grid-12 mc-padded-inner-bottom">
-
-                      пантограф
-
-
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td class="property-title lg-grid-4 xs-grid-5 mc-grid-12 padded-inner-right mc-padded-zero">Наполнение:</td>
-                    <td class="property-values lg-grid-8 xs-grid-7 mc-grid-12 mc-padded-inner-bottom">
-
-                      пружинная змейка, ППУ
-
-
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td class="property-title lg-grid-4 xs-grid-5 mc-grid-12 padded-inner-right mc-padded-zero">Материал ножек:</td>
-                    <td class="property-values lg-grid-8 xs-grid-7 mc-grid-12 mc-padded-inner-bottom">
-
-                      массив
-
-
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td class="property-title lg-grid-4 xs-grid-5 mc-grid-12 padded-inner-right mc-padded-zero">Наполнение подушек:</td>
-                    <td class="property-values lg-grid-8 xs-grid-7 mc-grid-12 mc-padded-inner-bottom">
-
-                      холлофайбер
+                      {{ child_props.name }}
 
 
                     </td>
@@ -408,36 +358,41 @@
     },
     methods: {
       get_product() {
-        axios.get('/vue/get-product-page/' + this.model).then((response) => {
+        axios.get(this.$microservices_url + this.$micro_products_port + '/get-product-page/ru/' + this.model).then((response) => {
           this.product = response.data;
           this.rendered = true;
+          console.log(this.product);
         });
       },
       owl_init() {
-        $( '.js-slider--gallery' ).owlCarousel({
-          responsive: {
-            0:    { items: 1 },
-            480:  { items: 1 },
-            640:  { items: 1 },
-            800:  { items: 2 },
-            1100: { items: 3 }
-          },
-          slideBy: 'page',
-          nav: true,
-          navClass: ['slider-left--gallery slider-left owl-prev', 'slider-right--gallery slider-right owl-next'],
-          navText: ['<i class="fa fa-angle-left" />', '<i class="fa fa-angle-right" />'],
-          navContainerClass: 'slider-control--gallery owl-nav slider-control',
-        });
+        setTimeout(() => {
+          $( '.js-slider--gallery' ).owlCarousel({
+            responsive: {
+              0:    { items: 1 },
+              480:  { items: 1 },
+              640:  { items: 1 },
+              800:  { items: 2 },
+              1100: { items: 3 }
+            },
+            slideBy: 'page',
+            nav: true,
+            navClass: ['slider-left--gallery slider-left owl-prev', 'slider-right--gallery slider-right owl-next'],
+            navText: ['<i class="fa fa-angle-left" />', '<i class="fa fa-angle-right" />'],
+            navContainerClass: 'slider-control--gallery owl-nav slider-control',
+          });
 
-        $(".js-slider--gallery .gallery-preview a").click(function(e){
-          e.preventDefault();
-          $(".gallery-large_image .zoom-on-hover .normal,.gallery-large_image .zoom-on-hover .zoom").attr('src',$(this).children('img').attr('src'));
-        });
+          $(".js-slider--gallery .gallery-preview a").click(function(e){
+            e.preventDefault();
+            $(".gallery-large_image .zoom-on-hover .normal,.gallery-large_image .zoom-on-hover .zoom").attr('src',$(this).children('img').attr('src'));
+          });
+        },1000);
       },
       accordion_init() {
-        $(".js-accordion-header").click(function(){
-          $(this).next().slideToggle(200);
-        });
+        setTimeout(() => {
+          $(".js-accordion-header").click(function(){
+            $(this).next().slideToggle(200);
+          });
+        },1000);
       },
       reload_basket() {
         this.$refs.product_cart.reload_basket();
@@ -447,10 +402,8 @@
       this.get_product();
     },
     mounted() {
-      setTimeout(() => {
-        this.owl_init();
-        this.accordion_init();
-      },1000);
+      this.owl_init();
+      this.accordion_init();
     }
   }
 </script>

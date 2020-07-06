@@ -25,7 +25,14 @@ import cartPage from './vue_components/shop/cart-page';
 
 /* START shop partials */
 import productCard from './vue_components/shop/parts/product-card';
-/* START shop partials */
+/* START settings */
+
+Vue.prototype.$microservices_url = "http://192.168.39.195";
+Vue.prototype.$micro_products_port = ":30101";
+Vue.prototype.$micro_others_port = ":30201";
+Vue.prototype.$language = "ru";
+
+import axios from 'axios';
 
 new Vue({
   el: '#app',
@@ -63,5 +70,5 @@ new Vue({
     setFilters: function(products) {
       this.$refs.product_list.setFilters(products);
     },
-  }
+  },
 })

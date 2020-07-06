@@ -6,6 +6,7 @@ import (
     "net/http"
     "strconv"
     "database/sql"
+    "encoding/json"
     _ "github.com/go-sql-driver/mysql"  
 )
 
@@ -79,6 +80,48 @@ func getDiscout(returned_type string, discount_type int, price int, discount_sql
     }else{
         return "0"
     }
+}
+
+func GetProductGallery(product int,w http.ResponseWriter) (gallery string){
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+    db, err := sql.Open(SqlDriver, SqlConnectionStr)
+    if err != nil {
+        log.Print(err.Error())
+    }
+    defer db.Close()
+
+    gallery_map := make(map[int]map[string]string)
+
+    gallery_query, gallery_err := db.Query("SELECT gallery_image.rank FROM gallery_image WHERE type='products' AND ownerId="+strconv.Itoa(product))
+    
+    if gallery_err != nil {
+        panic(gallery_err.Error())
+    }
+
+    counter := 0
+    for gallery_query.Next() {
+        var image string
+
+        scan_err := gallery_query.Scan(&image)
+        if scan_err != nil {
+            panic(scan_err.Error())
+        }
+
+        gallery_map[counter] = map[string]string{
+            "image": "/storage/gallery/products/" + strconv.Itoa(product) + "/" + image + "/medium.jpg",
+        }
+
+        counter++
+    }
+
+    galleryJson, gallery_err := json.Marshal(gallery_map)
+    if gallery_err != nil {
+        log.Fatal("Cannot encode to JSON ", gallery_err)
+    }
+
+    gallery = string(galleryJson)
+
+    return gallery
 }
 
 func GetProductsImage2(product int,w http.ResponseWriter) (image2 string) {

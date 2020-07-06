@@ -26,7 +26,31 @@
 </template>
 
 <script>
+  import axios from 'axios';
+
   export default {
-    name: 'spec-offer'
+    name: 'spec-offer',
+    data() {
+      return {
+        offer: [],
+        showing: [],
+        translations: [],
+      }
+    },
+    methods: {
+      get_offer (){
+        var object = this;
+        axios
+          .get(this.$microservices_url + this.$micro_others_port + '/get-units/ru/3')
+          .then(function(r){
+            object.offer = new Array(r. data.length);
+            object.offer = r.data;
+            console.log(object.offer);
+          });
+      },
+    },
+    mounted: function() {
+      this.get_offer();
+    }
   }
 </script>

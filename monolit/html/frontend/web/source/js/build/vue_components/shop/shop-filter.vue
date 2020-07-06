@@ -62,7 +62,7 @@
     },
     methods: {
       get_filters() {
-        axios.get('http://172.17.0.3:30101/get-filters/ru/' + this.category).then((response) => {
+        axios.get(this.$microservices_url + this.$micro_products_port + '/get-filters/ru/' + this.category).then((response) => {
           this.filters = new Array(response.data.length);
           this.filters = response.data;
           this.prices = [

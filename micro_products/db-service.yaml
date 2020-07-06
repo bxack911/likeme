@@ -9,5 +9,6 @@ spec:
   ports:
   - port: 3306
     protocol: TCP
+    nodePort: 30401
   selector:
     app: products-mysql8

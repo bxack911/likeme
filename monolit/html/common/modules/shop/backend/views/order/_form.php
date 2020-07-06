@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use kartik\form\ActiveForm;
 use yii\helpers\ArrayHelper;
 
-$order = $model->initialize($model->id);
+$order = $model->getOrder($model->id);
 
 ?>
 

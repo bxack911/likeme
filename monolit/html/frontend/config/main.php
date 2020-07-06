@@ -16,10 +16,6 @@ return [
             'class' => 'yii\gii\Module',
             'allowedIPs' => ['*']
         ],
-        'debug' => [
-            'class' => 'yii\debug\Module',
-            'allowedIPs' => ['*']
-        ],
     ],
     'components' => [
         'cache' => [
@@ -47,7 +43,7 @@ return [
         ],
         'urlManager' => require(__DIR__ . '/_urlManager.php'),
         'assetManager' => [
-            'linkAssets' => false,
+            'linkAssets' => true,
         ],
         'request' => [
             'enableCsrfCookie' => false,

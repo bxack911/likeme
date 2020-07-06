@@ -25,6 +25,7 @@ type UnitsTable struct {
     Html string `json:"html"`
 }
 
+
 func GetUnits(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
     w.Header().Set("Access-Control-Allow-Origin", "*")
 
@@ -38,10 +39,10 @@ func GetUnits(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
     // Execute the query
     results, err := db.Query("SELECT units.id,units.status,units.link,units.type, " +
         "units_translation.content AS content, units_translation.content2 AS content2, units_translation.html AS html, units_translation.html2 AS html2, units_translation.title AS title, " +
-        "filemanager_mediafile.url AS image " +
+        "COALESCE(filemanager_mediafile.url, 'null') AS image " +
         "FROM ((units "+
         "INNER JOIN units_translation ON units_translation.unit_id=units.id) "+
-        "INNER JOIN filemanager_mediafile ON filemanager_mediafile.id=units.image) "+
+        "LEFT JOIN filemanager_mediafile ON filemanager_mediafile.id=units.image) "+
         "WHERE units.status=1 AND units.type="+ps.ByName("type")+" AND units_translation.language='"+ps.ByName("language")+"'")
     if err != nil {
         fmt.Fprintf(w, "test")

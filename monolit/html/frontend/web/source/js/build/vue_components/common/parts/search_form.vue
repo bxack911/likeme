@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div v-if="showing">
     <form action="/search" method="get" class="search_widget search_widget--header">
-      <input type="text" v-model="key" v-on:keyup="get_result" name="q" value="" placeholder="Поиск" class="search_widget-field" />
+      <input type="text" v-model="key" v-on:keyup="get_result" name="q" value="" :placeholder="getTranslation('Search')" class="search_widget-field" />
       <button type="submit" class="search_widget-submit">
-        <img src="https://assets3.insales.ru/assets/1/7887/1285839/1586265738/search_icon.svg">
+        <img src="/storage/icons/search_icon.svg">
       </button>
     </form>
     <div class="header_search_results" v-if="search_on">
@@ -11,15 +11,15 @@
         <div class="img"><a :href="product.link"><img :src="product.image" alt=""></a></div>
         <div class="medium">
           <div class="title"><a :href="product.link">{{ product.title }}</a></div>
-          <div class="articul">Артикул: {{ product.articul }}</div>
+          <div class="articul">{{ getTranslation('Item') }}: {{ product.articul }}</div>
         </div>
         <div class="price">
           <div class="product-prices prices" v-if="product.prod_discount != 0">
-            <span class="prices-old js-prices-old">{{ product.price }} грн.</span>
-            <span class="prices-current js-prices-current">{{ product.discount_sum }} грн.</span>
+            <span class="prices-old js-prices-old">{{ product.price }} {{ getTranslation('grn') }}.</span>
+            <span class="prices-current js-prices-current">{{ product.discount_sum }} {{ getTranslation('grn') }}.</span>
           </div>
           <div class="product-prices prices" v-if="product.prod_discount == 0">
-            <span class="prices-current js-prices-current">{{ product.price }} грн.</span>
+            <span class="prices-current js-prices-current">{{ product.price }} {{ getTranslation('grn') }}.</span>
           </div>
         </div>
       </div>
@@ -35,6 +35,8 @@
     data() {
       return {
         key: '',
+        showing: false,
+        translations: [],
         search_results: [],
         search_on: false,
       }
@@ -57,12 +59,23 @@
               this.search_on = false;
             }
 
-            console.log(this.search_results);
           });
         }else{
           this.search_on = false;
         }
-      }
+      },
+      getTranslations: function() {
+        axios.get(this.$microservices_url + this.$micro_others_port + '/get-translations').then((response) => {
+          this.translations = response.data;
+          this.showing = true;
+        });
+      },
+      getTranslation: function(key) {
+        return JSON.parse(this.translations[key].value)[this.$language];
+      },
+    },
+    created() {
+      this.getTranslations();
     }
   }
 </script>

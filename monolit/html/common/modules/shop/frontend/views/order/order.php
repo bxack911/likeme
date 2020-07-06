@@ -17,27 +17,29 @@ use yii\widgets\MaskedInput;
             <span class="co-sidebar-toggler_title">Ваш заказ</span>
             <span class="co-icon halfling-menu-down"><i class="fa fa-chevron-down"></i></span>
           </span>
-          <span class="co-basket_total-price co-price--current"><?= $cart->cart[0]->sum ?> грн.</span>
+          <span class="co-basket_total-price co-price--current"><?= $model['cart'][1]['sum'] ?> грн.</span>
         </button>
         <div class="co-sidebar js-co-sidebar co-sidebar--fixed co-sidebar--hidden@sm">
           <div class="co-basket co-checkout-block--padded">
+            <?php if($model['cart']): ?>
             <div class="co-basket_item-list">
 
-              <?php foreach($model['cart']->products as $product): ?>
+              <?php foreach($model['cart'] as $product): ?>
                 <div class="co-basket_item">
-                  <div class="co-basket_item-image"><img src="<?= $product->image ?>" alt="image"></div>
-                  <div class="co-basket_item-description"><?= $product->title ?></div>
+                  <div class="co-basket_item-image"><img src="<?= $product['image'] ?>" alt="image"></div>
+                  <div class="co-basket_item-description"><?= $product['title'] ?></div>
                   <div class="co-basket_item-total">
-                    <span class="co-basket_item-count"><?= $product->quantity ?></span> x <span class="co-basket_item-price co-price--current"><?= $product->sum ?> грн.</span>
+                    <span class="co-basket_item-count"><?= $product['quantity'] ?></span> x <span class="co-basket_item-price co-price--current"><?= $product['sum'] ?> грн.</span>
                   </div>
                 </div>
               <?php endforeach ?>
 
             </div>
+            <?php endif; ?>
             <div class="co-basket_subtotal-list">
               <div class="co-basket_subtotal">
                 <div class="co-basket_subtotal-title">Сумма по товарам</div>
-                <div class="co-basket_subtotal-price co-price--current"><?= $model['cart']->cart[0]->sum ?> грн.</div>
+                <div class="co-basket_subtotal-price co-price--current"><?= $model['cart'][1]['sum'] ?> грн.</div>
               </div>
               <div id="discounts-block"></div>
               <div class="co-basket_subtotal">
@@ -47,7 +49,7 @@ use yii\widgets\MaskedInput;
             </div>
             <div class="co-basket_total">
               <div class="co-basket_total-title">Итого:</div>
-              <div class="co-basket_total-price co-price--current" id="total_price"><?= $model['cart']->cart[0]->sum ?> грн.</div>
+              <div class="co-basket_total-price co-price--current" id="total_price"><?= $model['cart'][1]['sum'] ?> грн.</div>
             </div>
           </div>
         </div>
@@ -57,7 +59,7 @@ use yii\widgets\MaskedInput;
       ]]); ?>
         <input type="hidden" name="_model" value="<?= $orderForm->model ?>" />
         <?= $form->field($orderForm, 'date')->hiddenInput(['value' => date('Y-m-d H:i:s')])->label(false) ?>
-        <?= $form->field($orderForm, 'sum')->hiddenInput(['value' => $model['cart']->cart[0]->sum])->label(false) ?>
+        <?= $form->field($orderForm, 'sum')->hiddenInput(['value' => $model['cart'][1]['sum']])->label(false) ?>
         <div class="co-delivery_method-list co-checkout-block">
 
           <div class="co-checkout-block">

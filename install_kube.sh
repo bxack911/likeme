@@ -18,39 +18,26 @@ apt-cache policy docker-ce
 #      18.03.1~ce~3-0~ubuntu 500
 #         500 https://download.docker.com/linux/ubuntu bionic/stable amd64 Packages
 sudo apt install docker-ce
-sudo systemctl status docker
-#!/Look at output, must be output like:
-#docker.service - Docker Application Container Engine
-#   Loaded: loaded (/lib/systemd/system/docker.service; enabled; vendor preset: enabled)
-#   Active: active (running) since Thu 2018-07-05 15:08:39 UTC; 2min 55s ago
-#     Docs: https://docs.docker.com
-# Main PID: 10096 (dockerd)
-#    Tasks: 16
-#   CGroup: /system.slice/docker.service
-#           ├─10096 /usr/bin/dockerd -H fd://
-#           └─10113 docker-containerd --config /var/run/docker/containerd/containerd.toml
 
-#install minikube
-#info from https://computingforgeeks.com/how-to-install-minikube-on-ubuntu-debian-linux/
 sudo apt-get update
 sudo apt-get install apt-transport-https
 sudo apt-get upgrade
-sudo apt install virtualbox virtualbox-ext-pack
-wget https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-chmod +x minikube-linux-amd64
-sudo mv minikube-linux-amd64 /usr/local/bin/minikube
-#Confirm minikube version
-minikube version
-#output like:
-# minikube version: v1.9.2
-# commit: 93af9c1e43cab9618e301bc9fa720c63d5efa393
 
 #install kubectl
 curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
 chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
-#check version
-kubectl version -o json 
+#install kvm2 driver for k8s
+sudo apt install cpu-checker && sudo kvm-ok
+sudo kvm-ok
+
+sudo apt install libvirt-clients libvirt-daemon-system qemu-kvm \
+    && sudo usermod -a -G libvirt $(whoami) \
+    && newgrp libvirt
+
+sudo virt-host-validate
+#check version kubctl
+kubectl version -o json
 # Output like:
 #{
 #  "clientVersion": {
@@ -65,7 +52,15 @@ kubectl version -o json
 #    "platform": "linux/amd64"
 #  }
 #}
-#start minikube
-minikube start
+
+#install microk8s
+#if you have-t snap, install it.
+# sudo rm /etc/apt/preferences.d/nosnap.pref
+# sudo apt install snapd
+sudo snap install microk8s --classic
+microk8s status --wait-ready
+#start microk8s
+microk8s enable dashboard dns registry istio
+microk8s kubectl get all --all-namespaces
 #start minikube dashboard. Wait for 5-10 minutes.
-minikube dashboard
+microk8s dashboard-proxy

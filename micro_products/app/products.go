@@ -33,6 +33,130 @@ type ProductsTable struct {
     Favourite bool `json:favourite`
 }
 
+
+func GetProductPage(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+
+    db, err := sql.Open(SqlDriver, SqlConnectionStr)
+
+    if err != nil {
+        log.Print(err.Error())
+    }
+    defer db.Close()
+
+    redis_con, redis_err := redis.Dial(RedisProtocol, RedisHost)
+    if redis_err != nil {
+        log.Fatal(redis_err)
+    }
+    defer redis_con.Close()
+
+    var tag ProductsTable
+
+    product_map := make(map[string]string)
+
+    product := db.QueryRow("SELECT products.id,products.quantity,products.slug,products.category,products.price,products.discount,products.discount_type,products.is_new,products.status,products.articul, " +
+        "products_translation.title AS title, products_translation.description AS description, products_translation.short_description AS short_description, " +
+        "filemanager_mediafile.url AS image " +
+        "FROM ((products "+
+        "INNER JOIN products_translation ON products_translation.product_id=products.id) "+
+        "INNER JOIN filemanager_mediafile ON filemanager_mediafile.id=products.image) "+
+        "WHERE products.status=1 AND products.id="+ps.ByName("product")+" AND products_translation.language='"+ps.ByName("language")+"'")
+
+    product.Scan(&tag.ID, &tag.Quantity, &tag.Slug, &tag.Category, &tag.Price, &tag.Discount, &tag.DiscountType, &tag.IsNew, &tag.Status, &tag.Articul, &tag.Title, &tag.Description, &tag.ShortDescription, &tag.Image)
+
+    properties,properties_err := db.Query("SELECT properties.id,properties_translation.name,properties_translation.value FROM properties " +
+        "INNER JOIN properties_translation ON properties.id=properties_translation.property_id " + 
+        "WHERE properties.status=1 AND product_id="+strconv.Itoa(tag.ID)+" AND properties.parent IS NULL AND properties_translation.language='"+ps.ByName("language")+"'")
+
+    if properties_err != nil {
+        panic(properties_err.Error())
+    }
+
+    properties_map := make(map[int]map[string]string)
+
+    counter := 0
+    for properties.Next() {
+        var prop_id int
+        var prop_name string
+        var prop_value string
+
+        properties.Scan(&prop_id,&prop_name,&prop_value)
+
+        child_props,child_props_err := db.Query("SELECT properties.id,properties_translation.name,properties_translation.value FROM properties " +
+        "INNER JOIN properties_translation ON properties.id=properties_translation.property_id " + 
+        "WHERE properties.status=1 AND properties.parent="+strconv.Itoa(prop_id)+" AND properties_translation.language='"+ps.ByName("language")+"'")
+
+        if child_props_err != nil {
+            panic(child_props_err.Error())
+        }
+
+        child_props_map := make(map[int]map[string]string)
+
+        child_counter := 0
+        for child_props.Next() {
+            var child_prop_id int
+            var child_prop_name string
+            var child_prop_value string
+
+            child_props.Scan(&child_prop_id,&child_prop_name,&child_prop_value)
+
+            child_props_map[child_counter] = map[string]string {
+                "id": strconv.Itoa(child_prop_id),
+                "name": child_prop_name,
+                "value": child_prop_value,
+            }
+        }
+
+        child_props_json,child_props_json_err := json.Marshal(child_props_map)
+        if child_props_json_err != nil {
+            log.Fatal("Cannot encode to JSON ", child_props_json_err)
+        }
+
+        properties_map[counter] = map[string]string {
+            "id": strconv.Itoa(prop_id),
+            "name": prop_name,
+            "value": prop_value,
+            "childs": string(child_props_json),
+        }
+    }
+
+    props_json,props_json_err := json.Marshal(properties_map)
+    if props_json_err != nil {
+        log.Fatal("Cannot encode to JSON ", props_json_err)
+    }
+
+    product_map = map[string]string{
+            "id":strconv.Itoa(tag.ID),
+            "quantity":strconv.Itoa(tag.Quantity),
+            "slug":tag.Slug,
+            "category":strconv.Itoa(tag.Category),
+            "price":strconv.Itoa(tag.Price),
+            "discount":getDiscout("label",tag.DiscountType,tag.Price,tag.Discount),
+            "discount_sum":getDiscout("sum",tag.DiscountType,tag.Price,tag.Discount),
+            "discount_type":strconv.Itoa(tag.DiscountType),
+            "is_new":strconv.Itoa(tag.IsNew),
+            "status":strconv.Itoa(tag.Status),
+            "articul":tag.Articul,
+            "title":tag.Title,
+            "description":tag.Description,
+            "short_description":tag.ShortDescription,
+            "image":tag.Image,
+            "image2":GetProductsImage2(tag.ID,w),
+            "gallery":GetProductGallery(tag.ID,w),
+            "link":tag.Link,
+            "favourite":strconv.FormatBool(tag.Favourite),
+            "props":string(props_json),
+            "available":strconv.Itoa(1),
+    }
+
+
+    productJson, err := json.Marshal(product_map)
+    if err != nil {
+        log.Fatal("Cannot encode to JSON ", err)
+    }
+    fmt.Fprintf(w, string(productJson))
+}
+
 func GetProducts(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
     w.Header().Set("Access-Control-Allow-Origin", "*")
 

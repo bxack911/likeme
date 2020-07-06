@@ -12,9 +12,9 @@
 
     <div class="basket-dropdown basket_list sm-hidden xs-hidden padded-inner">
       <div class="basket_list-header">
-        <span class="basket_list-title">Корзина <span v-if="cart != 0">(товаров {{ cart.product_quantity }})</span></span>
+        <span class="basket_list-title">{{ getTranslation('Basket') }} <span v-if="cart != 0">(товаров {{ cart.product_quantity }})</span></span>
         <div class="notice" v-if="cart == 0">
-          Корзина пуста. Добавьте интересующий товар в корзину и перейдите к оформлению заказа.
+          {{ empty_cartung_text }}
         </div>
         <div v-if="cart != undefined">
           <ol class="basket_list-items">
@@ -27,23 +27,23 @@
                 <div class="basket_item-details right">
                   <span class="basket_item-count">{{ product.quantity }} x</span>
                   <span class="basket_item-price prices">
-                    <span class="prices-current">{{ product.sum }} грн.</span>
+                    <span class="prices-current">{{ product.sum }} {{ getTranslation('grn') }}.</span>
                   </span>
                 </div>
               </div>
               <a class="lg-grid-1 basket_item-delete js-cart_item-delete" title="Удалить из корзины"v-on:click="clear_cart(product.id)">
-                <img src="https://assets3.insales.ru/assets/1/7887/1285839/1586265738/cross_icon.svg" alt="">
+                <img src="/storage/icons/cross_icon.svg" alt="">
               </a>
             </li>
           </ol>
           <div class="basket_list-footer" v-if="cart != 0">
             <div class="basket_list-total right">
-              <span class="basket_list-span">Итого без учета доставки:</span>
-              <div class="basket_list-price prices-current">{{ cart.sum }} грн.</div>
+              <span class="basket_list-span">{{ getTranslation("header_cartung_sum") }}:</span>
+              <div class="basket_list-price prices-current">{{ cart.sum }} {{ getTranslation('grn') }}.</div>
             </div>
             <div class="basket_list-buttons">
-              <a href="/cart" class="basket_list-submit button button--border">Просмотреть корзину</a>
-              <a href="/cart" class="basket_list-submit button button--buy">Офофрмить заказ</a>
+              <a href="/cart" class="basket_list-submit button button--border">{{ getTranslation('View cartung') }}</a>
+              <a href="/order" class="basket_list-submit button button--buy">{{ getTranslation('Checkout') }}</a>
             </div>
           </div>
         </div>
@@ -54,6 +54,7 @@
 
 <script>
   import axios from 'axios';
+  import Vue from "vue";
 
   export default {
     name: 'header-cartung',
@@ -61,13 +62,14 @@
       return {
         quantity: 0,
         cart: [],
-        showing: true,
+        showing: false,
         products: [],
+        translations: [],
       }
     },
     methods: {
       get_cart() {
-        axios.get('http://172.17.0.3:30101/get-cartung/1/ru').then((response) => {
+        axios.get(this.$microservices_url + this.$micro_products_port + '/get-cartung/1/ru').then((response) => {
           var data = response.data;
 
           if(data[0] != undefined && data[1] != undefined){
@@ -78,19 +80,33 @@
             this.products = 0;
             this.cart = 0;
           }
+        }).catch((err) => {
+          console.log(err);
         });
       },
       clear_cart(id) {
-        axios.get('http://172.17.0.3:30101/delete-cart/1/'+id+'/ru').then((response) => {
+        axios.get(this.$microservices_url + this.$micro_products_port + '/delete-cart/1/'+id+'/ru').then((response) => {
           this.reload();
+        }).catch((err) => {
+          console.log(err);
         });
       },
       reload() {
         this.get_cart();
-      }
+      },
+      getTranslations: function() {
+        axios.get(this.$microservices_url + this.$micro_others_port + '/get-translations').then((response) => {
+          this.translations = response.data;
+          this.showing = true;
+        });
+      },
+      getTranslation: function(key) {
+        return JSON.parse(this.translations[key].value)[this.$language];
+      },
     },
     created() {
       this.get_cart();
+      this.getTranslations();
     }
   }
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="showing">
     <div class="product-control">
       <div class="product-quantity quantity quantity--side" data-quantity>
         <div class="quantity-button quantity-button--minus button js-quantity-minus" v-on:click="decrease">-</div>
@@ -7,14 +7,14 @@
         <div class="quantity-button quantity-button--plus button js-quantity-plus" v-on:click="increase">+</div>
       </div>
       <button class="product-buy button  js-buy" v-on:click="add">
-        В корзину
+        {{ getTranslation('To cart') }}
       </button>
       <button class="product-buy button quick_btn" data-quick-checkout>
-        Заказ в 1 клик
+        {{ getTranslation('1 click order') }}
       </button>
       <button type="button" class="block_wirl_fav" data-favorites-trigger="155454002">
-        <img src="https://assets3.insales.ru/assets/1/7887/1285839/1586265738/wirl_fav.svg" class="wirl_fav">
-        <img src="https://assets3.insales.ru/assets/1/7887/1285839/1586265738/wirl_fav_hover.svg" class="wirl_fav_hover">
+        <img src="/storage/icons/wirl_fav.svg" class="wirl_fav">
+        <img src="/storage/icons/wirl_fav_hover.svg" class="wirl_fav_hover">
       </button>
     </div>
     <div class="product-compare compare-trigger lg-grid-12">
@@ -22,13 +22,13 @@
                         js-compare-add"
                   data-product_id="155454002">
               <i class="fa fa-bar-chart"></i>
-              <span class="compare-trigger_text">добавить к сравнению</span>
+              <span class="compare-trigger_text">{{ getTranslation(' add to comparison') }}</span>
             </span>
 
       <a href="/compares/"
          class="compare-added">
         <i class="fa fa-check"></i>
-        <span class="compare-trigger_text">перейти к сравнению</span>
+        <span class="compare-trigger_text">{{ getTranslation('go to comparison') }}</span>
       </a>
     </div>
   </div>
@@ -44,6 +44,8 @@
     data() {
       return {
         quantity: 1,
+        showing: false,
+        translations: [],
       }
     },
     components: {
@@ -63,7 +65,7 @@
       add() {
         this.quantity = document.querySelector('#product_quantity').value;
 
-        axios.get('http://172.17.0.3:30101/get-cart/1/'+this.product+'/ru/sum/' + this.quantity).then((response) => {
+        axios.get(this.$microservices_url + this.$micro_products_port + '/get-cart/1/'+this.product+'/ru/sum/' + this.quantity).then((response) => {
           document.querySelector('.modal--product_added').setAttribute("style", 'display: block');
           document.querySelector('.overlay').setAttribute("style", 'display: block');
           this.$root.reloadCartung();
@@ -71,11 +73,23 @@
       },
       reload_basket() {
         this.quantity = 1;
+      },
+      getTranslations: function () {
+        axios.get(this.$microservices_url + this.$micro_others_port + '/get-translations').then((response) => {
+          this.translations = response.data;
+          this.showing = true;
+        });
+      },
+      getTranslation: function (key) {
+        return JSON.parse(this.translations[key].value)[this.$language];
       }
     },
     mounted() {
-      axios.get('http://172.17.0.3:30101/get-quantity/1/' + this.product).then((response) => {
+      this.getTranslations();
+      axios.get(this.$microservices_url + this.$micro_products_port + '/get-quantity/1/' + this.product).then((response) => {
         if(response.data !== null) this.quantity = response.data;
+      }).catch((err) => {
+        this.quantity = 1;
       });
     }
   }

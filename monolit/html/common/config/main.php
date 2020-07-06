@@ -34,7 +34,7 @@ return [
     'components' => [
         'redis' => [
             'class' => 'yii\redis\Connection',
-            'hostname' => 'monolit-redis-service',
+            'hostname' => '192.168.39.67:31635',
             'port' => 6379,
             'database' => 0,
         ],

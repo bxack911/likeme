@@ -63,7 +63,7 @@
       get_blocks (){
         var object = this;
         axios
-                .get('http://172.17.0.3:30201/get-units/ru/2')
+                .get(this.$microservices_url + this.$micro_others_port + '/get-units/ru/2')
                 .then(function(r){
                   object.big_blocks = new Array(r. data.length);
                   object.big_blocks = r.data;
